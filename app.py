@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import os
@@ -28,20 +28,22 @@ class EntrySchema(ma.Schema):
 entry_schema = EntrySchema()
 entries_schema = EntrySchema(many = True)
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/entry', methods = ['POST'])
 def create_entry():
     
-    title = request.json['title']
-    content = request.json['content']
+    title = request.form['title']
+    content = request.form['content']
 
     new_entry = Entry(title, content)
 
     db.session.add(new_entry)
     db.session.commit()
 
-    entry = Entry.query.get(new_entry.id)
-
-    return entry_schema.jsonify(entry)
+    return render_template('index.html')
 
 # End point to create a new entry
 
